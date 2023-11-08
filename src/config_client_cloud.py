@@ -5,3 +5,4 @@ load_dotenv()
 
 CognitoClientID = os.getenv('COGNITO_USER_CLIENT_ID')
 CognitoClient = boto3.client('cognito-idp', region_name=os.getenv('COGNITO_REGION_NAME'))
+CognitoUserPoolID = os.getenv('COGNITO_USER_POOL_ID')

@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_cors import CORS
 from flask import request
-from util import build_user_json_response, generate_key
-from config_client_cloud import CognitoClientID, CognitoClient
+from util import json_response, generate_key
+from config_client_cloud import CognitoClientID, CognitoClient, CognitoUserPoolID
 
 app = Flask(__name__)
 CORS(app)
@@ -48,28 +48,41 @@ def create_user():
         UserAttributes=user_attributes
     )
     print(response)
-    return build_user_json_response("", ""), 201
+    return json_response("", ""), 201
 
 
 @app.route('/listUser', methods=['GET'])
 def list_user():
+    response = CognitoClient.list_users(
+        UserPoolId=CognitoUserPoolID,
+        AttributesToGet=[
+            'name',
+            'email',
+            'birthdate',
+            'address',
+        ],
+        Limit=10,
+       # PaginationToken='string',
+        #Filter='string'
+    )
+    print(response)
     return [{"id": "123456", "name": "Jean"}, {"id": "987654", "name": "Mary"}]
 
 
 @app.route('/updateUser/<id>', methods=['PUT'])
 def update_user(id):
     if id.isnumeric():
-        return build_user_json_response("id", "modified"), 200
+        return json_response("id", "modified"), 200
     else:
-        return build_user_json_response("Parameter ID is invalid", "error"), 400
+        return json_response("Parameter ID is invalid", "error"), 400
 
 
 @app.route('/deleteUser/<id>', methods=['DELETE'])
 def delete_user(id):
     if id.isnumeric():
-        return build_user_json_response("id", "deleted"), 200
+        return json_response("id", "deleted"), 200
     else:
-        return build_user_json_response("id parameter is invalid", "error"), 400
+        return json_response("id parameter is invalid", "error"), 400
 
 
 @app.route('/forgotPassword/<username>', methods=['POST'])
@@ -79,7 +92,7 @@ def forgot_password_user(username):
         Username=username,
     )
     print(response)
-    return build_user_json_response("", ""), 200
+    return json_response("", ""), 200
 
 
 @app.route('/confirmForgotPassword', methods=['POST'])
@@ -92,10 +105,10 @@ def confirm_forgot_password_user():
             ConfirmationCode=request.json['code'],
         )
         print(response)
-        return build_user_json_response("", ""), 200
+        return json_response("", ""), 200
 
     except Exception:
-        return build_user_json_response("Code verification is not valid", "error"), 400
+        return json_response("Code verification is not valid", "error"), 400
 
 
 if __name__ == '__main__':

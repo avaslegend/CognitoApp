@@ -2,7 +2,7 @@ import string
 import random
 
 
-def build_user_json_response(msg, event):
+def json_response(msg, event):
     status = "ok"
     code = "1"
     result = "success"
